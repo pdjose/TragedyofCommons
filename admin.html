@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tragedy of the Commons — Facilitator Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- ADMIN SETUP -->
+    <section id="admin-scr" class="scr active">
+        <div class="adm">
+            <!-- Cover Header -->
+            <div style="text-align:center;padding:32px 24px 28px;margin:-24px -24px 24px;background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(167,139,250,.12));border-radius:var(--r) var(--r) 0 0;border-bottom:1px solid var(--bd)">
+                <div style="font-size:3rem;margin-bottom:8px">🐟</div>
+                <h1 style="font-size:1.8rem;font-weight:800;margin:0 0 4px;letter-spacing:-.02em">
+                    <span style="color:var(--t1)">Tragedy of </span><span style="background:linear-gradient(135deg,var(--ac),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">the Commons</span>
+                </h1>
+                <div style="font-size:.85rem;color:var(--t2);margin-bottom:4px;font-weight:500">Facilitator Dashboard — Multiplayer Classroom Simulation</div>
+                <div style="display:inline-block;padding:4px 14px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);border-radius:20px;font-size:.75rem;color:var(--gn);font-weight:600;margin-top:6px">👁 Observer Mode — You are not a player</div>
+                
+                <div style="max-width:640px;margin:16px auto 0;text-align:left;background:rgba(0,0,0,.15);border-radius:12px;padding:16px 20px;font-size:.85rem;line-height:1.65;color:var(--t2)">
+                    <p style="margin:0 0 10px"><strong style="color:var(--t1)">About the Simulation:</strong> Students share a virtual fishing lake. Each round, they independently decide how many fish to harvest. The lake regenerates via logistic growth — but if the group overharvests, the ecosystem collapses. The core tension: <em>individual profit vs. collective sustainability</em>.</p>
+                    <p style="margin:0 0 10px"><strong style="color:var(--t1)">Learning Objectives:</strong> Garrett Hardin's tragedy of the commons, Elinor Ostrom's governance principles, Nash equilibrium vs. social optimum, and the role of communication, regulation, and transparency in managing shared resources.</p>
+                    <p style="margin:0"><strong style="color:var(--t1)">Quick Start:</strong> ① Configure parameters below → ② Add AI players (optional) → ③ Click <strong>Launch Shared Sea 🌊</strong> → ④ Share the room code with students → ⑤ Start the game when all have joined.</p>
+                </div>
+            </div>
+
+            <h2>⚙️ Game Setup</h2>
+            <p class="sub">Configure parameters, players, and AI villagers.</p>
+            <div class="adm-sec">
+                <h3>📊 Parameters</h3>
+                <div class="pg">
+                    <div class="pm"><label>Growth Rate (r)</label><input type="number" id="p-r" value="0.3" min="0.05"
+                            max="1" step="0.05">
+                        <div class="hn">Logistic regrowth speed</div>
+                    </div>
+                    <div class="pm"><label>Carrying Capacity (K)</label><input type="number" id="p-k" value="100"
+                            min="50" max="500" step="10">
+                        <div class="hn">Max fish population</div>
+                    </div>
+                    <div class="pm"><label>Rounds</label><input type="number" id="p-mr" value="20" min="5" max="50"
+                            step="1">
+                        <div class="hn">Total rounds</div>
+                    </div>
+                    <div class="pm"><label>Round Advance</label>
+                        <select id="p-timer-mode" onchange="document.getElementById('p-timer').style.display = this.value === 'auto' ? 'block' : 'none'" style="width:100%;padding:10px 14px;background:var(--cd);border:1px solid var(--bd);border-radius:var(--r);color:var(--t1);font-family:var(--f);margin-bottom:6px">
+                            <option value="manual">Manual Advance</option>
+                            <option value="auto">Auto Timer</option>
+                        </select>
+                        <input type="number" id="p-timer" value="30" min="5" max="300" step="5" style="display:none" placeholder="Seconds">
+                    </div>
+                </div>
+                
+                <div style="margin-top:20px;padding:16px;background:var(--cd);border:1px solid var(--bd);border-radius:var(--r)">
+                    <h4 style="margin:0 0 12px;color:var(--ac)">🎓 Pedagogical Controls</h4>
+                    
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px" title="If unchecked, the Theory/Learn panel will be hidden on player screens.">
+                        <input type="checkbox" id="p-learn-toggle" checked style="width:18px;height:18px">
+                        <span style="font-weight:600">📖 Learn Tab</span>
+                        <span style="font-size:.7rem;color:var(--t3);margin-left:auto">Show theory panel to students</span>
+                    </label>
+
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px" title="After this round, players get 30 seconds to see each other's harvests and type messages/agreements before the next round begins.">
+                        <input type="checkbox" id="p-comm-toggle" style="width:18px;height:18px">
+                        <span style="font-weight:600">💬 Communication Round</span>
+                        <span style="font-size:.7rem;color:var(--t3);margin-left:auto">every <input type="number" id="p-comm-round" value="5" min="2" max="15" style="width:40px;padding:2px 4px;background:var(--c2);border:1px solid var(--bd);border-radius:4px;color:var(--t1);text-align:center;font-size:.75rem"> rounds</span>
+                    </label>
+
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px" title="Shows a projection on player screens: 'At current harvest rates, the lake will collapse in X rounds.'">
+                        <input type="checkbox" id="p-forecast-toggle" style="width:18px;height:18px">
+                        <span style="font-weight:600">🔮 Forecast Tool</span>
+                        <span style="font-size:.7rem;color:var(--t3);margin-left:auto">Show collapse projection</span>
+                    </label>
+
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px" title="After each round, reveals which player harvested how many fish (with names).">
+                        <input type="checkbox" id="p-reveal-toggle" style="width:18px;height:18px">
+                        <span style="font-weight:600">👁 Harvest Reveal</span>
+                        <span style="font-size:.7rem;color:var(--t3);margin-left:auto">Show who took what</span>
+                    </label>
+
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px" title="Hides player names during play, showing only 'Fisher 1', 'Fisher 2' etc.">
+                        <input type="checkbox" id="p-anon-toggle" style="width:18px;height:18px">
+                        <span style="font-weight:600">🎭 Player Anonymity</span>
+                        <span style="font-size:.7rem;color:var(--t3);margin-left:auto">Hide names during play</span>
+                    </label>
+
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px" title="Imposes a per-player harvest cap.">
+                        <input type="checkbox" id="p-quota-toggle" style="width:18px;height:18px">
+                        <span style="font-weight:600">⚖️ Harvest Quota</span>
+                        <span style="font-size:.7rem;color:var(--t3);margin-left:auto">Cap: <input type="number" id="p-quota-val" value="3" min="1" max="20" style="width:40px;padding:2px 4px;background:var(--c2);border:1px solid var(--bd);border-radius:4px;color:var(--t1);text-align:center;font-size:.75rem"> fish/player</span>
+                    </label>
+
+                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer" title="Allow running multiple games back-to-back with the same players.">
+                        <input type="checkbox" id="p-replay-toggle" checked style="width:18px;height:18px">
+                        <span style="font-weight:600">🔄 Allow Replay</span>
+                        <span style="font-size:.7rem;color:var(--t3);margin-left:auto">Run multiple games</span>
+                    </label>
+                </div>
+            </div>
+            <div class="adm-sec">
+                <h3>🤖 AI Players <span style="font-size:.7rem;color:var(--t3);font-weight:400;text-transform:none">(max 3 — remaining slots are for human players)</span></h3>
+                <div class="pgr" id="ai-grid"></div>
+                <div class="add-row"><button class="btn btn-s" onclick="addAI()">+ Add AI</button></div>
+                <div style="margin-top:10px;font-size:.78rem;color:var(--t3);text-align:center">
+                    🌊 <strong>Shared Sea:</strong> All 10 players (humans + AI) fish from the same ocean together.
+                </div>
+            </div>
+            <div id="room-section" style="display:none">
+                <div class="adm-sec">
+                    <h3 style="text-align:center">🌊 Shared Sea Dashboard</h3>
+                    <div id="room-dashboard"></div>
+                    <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--bd)">
+                        <button class="btn btn-s" onclick="adminResetAllRooms()"
+                            style="background:rgba(248,113,113,0.1);color:var(--rd);border:1px solid rgba(248,113,113,0.2)">🗑️
+                            Reset Game</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="init-create-section" style="margin-top:2rem;text-align:center">
+                <button class="btn" onclick="createRoom('init')" style="padding:14px 36px;font-size:1.1rem">Launch Shared Sea 🌊</button>
+                <div style="font-size:.75rem;color:var(--t3);margin-top:8px">Creates a single game — all players share one ocean</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SIM (Admin Monitor View) -->
+    <section id="sim-scr" class="scr">
+        <header class="sim-h">
+            <div class="left">
+                <h2 class="logo">🐟 Commons</h2>
+                <div class="rbdg">Round <span id="rn">1</span> / <span id="mr">20</span></div>
+                <div style="padding:3px 12px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);border-radius:20px;font-size:.7rem;color:var(--gn);font-weight:600">👁 FACILITATOR</div>
+            </div>
+            <div class="right">
+                <button class="btn-i" title="Toggle Theme" onclick="toggleTheme()">🌓</button>
+                <button class="btn-i" title="Rules & Info" id="btn-learn-open"
+                    onclick="document.getElementById('edu').classList.add('open')">📖</button>
+            </div>
+        </header>
+        <div class="tb" id="tb">Monitoring Game</div>
+        <div id="admin-bar"
+            style="display:none;padding:8px 24px;text-align:center;border-bottom:1px solid var(--bd);background:rgba(56,189,248,.05)">
+            <button class="btn btn-s" onclick="backToRoomDashboard()"
+                style="margin-right:12px;background:var(--c3);color:var(--t1)">📋 Dashboard</button>
+            <button class="btn btn-s" id="btn-next" onclick="adminNextRound()" style="margin-right:12px">▶ Next
+                Round</button>
+            <button class="btn btn-s" id="btn-force" onclick="adminForceTurn()" style="margin-right:12px;background:rgba(251,191,36,.15);color:var(--yl);border:1px solid rgba(251,191,36,.3)">⏩ Force Turn</button>
+            <span id="timer-display" style="font-size:.9rem;color:var(--t2)"></span>
+        </div>
+        <div class="sim-l">
+            <div class="lp"><canvas id="lake"></canvas>
+                <div class="thermo">
+                    <div class="tval" id="hvl">100%</div>
+                    <div class="tbar">
+                        <div class="tfill" id="hfl" style="height:100%"></div>
+                    </div>
+                    <div class="tlbl">HEALTH</div>
+                </div>
+                <div class="thermo" style="margin-left:8px">
+                    <div class="tval" id="rgv" style="font-size:.65rem">0</div>
+                    <div class="tbar" style="width:10px">
+                        <div id="rgfill" style="position:absolute;bottom:0;width:100%;height:0%;background:linear-gradient(to top,#f87171,#fbbf24,#4ade80);border-radius:inherit;transition:height .5s"></div>
+                    </div>
+                    <div class="tlbl" style="font-size:.5rem">GROWTH</div>
+                </div>
+            </div>
+            <div class="ctrl">
+                <!-- No harvest card for admin — observer only -->
+                <div class="crd" id="harvest-card" style="display:none">
+                    <h3 class="ct" id="htitle">Observer</h3>
+                    <input type="range" id="hsl" min="0" max="20" value="5" class="hs" style="display:none">
+                    <div class="sv" id="slv" style="display:none"></div>
+                    <div id="harvest-context" style="display:none"></div>
+                    <div id="forecast-display" style="display:none"></div>
+                    <div id="quota-display" style="display:none"></div>
+                    <button id="btn-h" style="display:none"></button>
+                    <span id="ctx-fair" style="display:none"></span>
+                    <span id="ctx-rg" style="display:none"></span>
+                    <span id="hsl-max" style="display:none"></span>
+                </div>
+                <div class="vg" id="vg"></div>
+                <div class="rlc">
+                    <h3 class="ct">Round Log</h3>
+                    <div class="rl" id="rl">
+                        <div class="le">Play a round to see results here.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sts">
+                <div class="sc2">
+                    <div class="sl2">Fish Population</div>
+                    <div class="sv2" id="sp">100</div>
+                    <div class="ss" id="schg"></div>
+                </div>
+                <div class="sc2">
+                    <div class="sl2">Total Harvest (All Players)</div>
+                    <div class="sv2" id="se">$0</div>
+                    <div class="ss">$3 per fish</div>
+                </div>
+                <div class="sc2">
+                    <div class="sl2">MSY (Max Sust. Yield)</div>
+                    <div class="sv2" id="smsy" style="-webkit-text-fill-color:var(--gn);color:var(--gn)">—</div>
+                    <div class="ss">K×r÷4 — total for all players</div>
+                </div>
+                <div class="sc2">
+                    <div class="sl2">OSY (Optimum Sust. Yield)</div>
+                    <div class="sv2" id="sosy" style="-webkit-text-fill-color:var(--tl);color:var(--tl)">—</div>
+                    <div class="ss">≈ 80% of MSY — safe target</div>
+                </div>
+                <div class="sc2">
+                    <div class="sl2">Regrowth</div>
+                    <div class="sv2" id="srg">—</div>
+                </div>
+                <div class="sc2 cc">
+                    <div class="sl2">Population History</div><canvas id="ccv" height="140"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- EDU sidebar -->
+        <aside id="edu" class="edu">
+            <div class="edu-h">
+                <h3>📚 Learn</h3><button style="background:0;border:0;color:var(--t3);cursor:pointer;font-size:1.2rem"
+                    onclick="document.getElementById('edu').classList.remove('open')">✕</button>
+            </div>
+            <div class="etabs"><button class="etab active" onclick="stab(this,'theory')">Theory</button><button
+                    class="etab" onclick="stab(this,'strats')">Strategies</button><button class="etab"
+                    onclick="stab(this,'rw')">Real World</button></div>
+            <div class="econ">
+                <div class="ep active" id="pane-theory">
+                    <h4>Tragedy of the Commons</h4>
+                    <p>Coined by <strong>Garrett Hardin</strong> (1968): individuals acting in self-interest deplete a shared resource.</p>
+                    <div class="co"><strong>🔑</strong> Each person gains full benefit of taking more, but depletion cost is shared by all.</div>
+                    <h4>Maximum Sustainable Yield (MSY)</h4>
+                    <p><strong>MSY = K × r ÷ 4</strong> — the largest harvest sustainable indefinitely, at population K/2.</p>
+                    <div class="co"><strong>📐</strong> K=<span id="edu-k">100</span>, r=<span id="edu-r">0.3</span> → MSY = <strong><span id="edu-msy">7.5</span></strong> fish/round for ALL players.</div>
+                    <h4>Optimum Sustainable Yield (OSY)</h4>
+                    <p><strong>≈ 80% of MSY</strong> — conservative buffer for environmental variability.</p>
+                    <h4>Nash Equilibrium</h4>
+                    <p>Rational strategy: maximize harvest. But collective result = collapse.</p>
+                </div>
+                <div class="ep" id="pane-strats">
+                    <h4>AI Strategies</h4>
+                    <div class="co"><strong>🌿 Sustainable</strong> — ≤ fair share of regrowth</div>
+                    <div class="co"><strong>💰 Greedy</strong> — takes as much as possible</div>
+                    <div class="co"><strong>🪞 Copycat</strong> — mirrors average human harvest</div>
+                    <div class="co"><strong>🧠 Adaptive</strong> — scales with population health</div>
+                    <div class="co"><strong>🤝 Cooperative</strong> — minimum sustainable amount</div>
+                </div>
+                <div class="ep" id="pane-rw">
+                    <h4>Real-World Examples</h4>
+                    <p>🐟 <strong>Overfishing</strong> — Grand Banks cod collapsed 1992</p>
+                    <p>🌍 <strong>Climate Change</strong> — Atmosphere as shared commons</p>
+                    <p>💊 <strong>Antibiotic Resistance</strong> — Individual benefit, collective harm</p>
+                    <h4>Solutions</h4>
+                    <p>→ Regulation → Privatization → Community Governance (Ostrom) → Social Norms</p>
+                </div>
+            </div>
+        </aside>
+    </section>
+
+    <!-- END -->
+    <section id="end-scr" class="scr">
+        <div class="ec">
+            <div class="ei" id="eico">🐟</div>
+            <h2 class="et2" id="etit">Simulation Complete</h2>
+            <p class="es" id="esub"></p>
+            <div class="eg">
+                <div class="ek">
+                    <h3>🏆 Leaderboard</h3>
+                    <div id="est"></div>
+                </div>
+                <div class="ek">
+                    <h3>📈 Population Over Time</h3><canvas id="ecv" height="200"></canvas>
+                </div>
+            </div>
+            <div class="ek ekw">
+                <h3>🤔 What If Everyone Cooperated?</h3>
+                <div class="cf" id="ecf"></div>
+            </div>
+            <div class="ek ekw">
+                <h3>💬 Debriefing Questions</h3>
+                <div class="dq" id="edq"></div>
+            </div>
+            <div class="ek ekw">
+                <h3>📖 Key Lessons</h3>
+                <div class="lsn" id="els"></div>
+            </div>
+            <button class="btn" onclick="backToRoomDashboard()" style="margin-top:2rem">📋 Back to Dashboard</button>
+        </div>
+    </section>
+
+    <script src="game.js"></script>
+    <script>
+        // Auto-set admin role on this page
+        window.addEventListener('DOMContentLoaded', function () {
+            myRole = 'admin';
+            renderAdmin();
+        });
+    </script>
+</body>
+
+</html>

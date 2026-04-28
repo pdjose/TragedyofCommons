@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tragedy of the Commons — Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- INTRO -->
+    <section id="intro-scr" class="scr active">
+        <div class="ibg"></div>
+        <div class="ic">
+            <div class="ibdg">🐟 Multiplayer Simulation</div>
+            <h1 class="it"><span>Tragedy of</span><span class="grad">the Commons</span></h1>
+
+            <div class="intro-btns">
+                <button class="btn" style="background:linear-gradient(135deg,#a78bfa,#e879f9)" onclick="go('join')">🎮
+                    Join Game</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- JOIN -->
+    <section id="join-scr" class="scr">
+        <div class="join-c">
+            <h2>🎮 Join Game</h2>
+            <p>Enter the room code from the host screen and your name.</p>
+            <input class="jin" id="j-code" placeholder="ROOM CODE" maxlength="4">
+            <input class="jin jin2" id="j-name" placeholder="Your Name">
+            <button class="btn" onclick="joinGame()" style="margin-top:1rem;width:100%;justify-content:center">Join
+                Room</button>
+            <button class="btn-s" onclick="go('intro')"
+                style="margin-top:1rem;color:var(--t3);background:0;border:1px solid var(--bd);display:block;margin-left:auto;margin-right:auto">←
+                Back</button>
+        </div>
+    </section>
+
+    <!-- WAIT -->
+    <section id="wait-scr" class="scr">
+        <div class="wait-c">
+            <h2 id="wait-title">Waiting...</h2>
+            <p id="wait-msg">Waiting for the host to start the game.</p>
+            <div class="wait-dots"><span></span><span></span><span></span></div>
+            <div class="plist" id="wait-players"></div>
+        </div>
+    </section>
+
+    <!-- SIM -->
+    <section id="sim-scr" class="scr">
+        <header class="sim-h">
+            <div class="left">
+                <h2 class="logo">🐟 Commons</h2>
+                <div class="rbdg">Round <span id="rn">1</span> / <span id="mr">20</span></div>
+            </div>
+            <div class="right">
+                <button class="btn-i" title="Toggle Theme" onclick="toggleTheme()">🌓</button>
+                <button class="btn-i" title="Rules & Info" id="btn-learn-open"
+                    onclick="document.getElementById('edu').classList.add('open')">📖</button>
+            </div>
+        </header>
+        <div class="tb" id="tb">Your Turn</div>
+        <div id="admin-bar"
+            style="display:none;padding:8px 24px;text-align:center;border-bottom:1px solid var(--bd);background:rgba(56,189,248,.05)">
+            <button class="btn btn-s" onclick="backToRoomDashboard()"
+                style="margin-right:12px;background:var(--c3);color:var(--t1)">📋 Dashboard</button>
+            <button class="btn btn-s" id="btn-next" onclick="adminNextRound()" style="margin-right:12px">▶ Next
+                Round</button>
+            <button class="btn btn-s" id="btn-force" onclick="adminForceTurn()" style="margin-right:12px;background:rgba(251,191,36,.15);color:var(--yl);border:1px solid rgba(251,191,36,.3)">⏩ Force Turn</button>
+            <span id="timer-display" style="font-size:.9rem;color:var(--t2)"></span>
+        </div>
+        <div class="sim-l">
+            <div class="lp"><canvas id="lake"></canvas>
+                <div class="thermo">
+                    <div class="tval" id="hvl">100%</div>
+                    <div class="tbar">
+                        <div class="tfill" id="hfl" style="height:100%"></div>
+                    </div>
+                    <div class="tlbl">HEALTH</div>
+                </div>
+                <div class="thermo" style="margin-left:8px">
+                    <div class="tval" id="rgv" style="font-size:.65rem">0</div>
+                    <div class="tbar" style="width:10px">
+                        <div id="rgfill" style="position:absolute;bottom:0;width:100%;height:0%;background:linear-gradient(to top,#f87171,#fbbf24,#4ade80);border-radius:inherit;transition:height .5s"></div>
+                    </div>
+                    <div class="tlbl" style="font-size:.5rem">GROWTH</div>
+                </div>
+            </div>
+            <div class="ctrl">
+                <div class="crd" id="harvest-card">
+                    <h3 class="ct" id="htitle">Your Harvest</h3>
+                    <div style="text-align:center"><input type="range" id="hsl" min="0" max="20" value="5" class="hs"
+                            oninput="usl()">
+                        <div class="sv" id="slv">5 fish</div>
+                    </div>
+                    <div class="sl"><span>0 (Conserve)</span><span id="hsl-max">20 (Max)</span></div>
+                    <div id="harvest-context" style="text-align:center;font-size:.75rem;color:var(--t3);padding:6px 0;line-height:1.6">
+                        <span style="color:var(--gn)">🌿 Fair share: <strong id="ctx-fair">—</strong></span> · 
+                        <span>Regrowth: <strong id="ctx-rg">—</strong></span>
+                    </div>
+                    <div id="forecast-display" style="display:none;text-align:center;font-size:.75rem;padding:6px 8px;margin-bottom:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;color:var(--rd)"></div>
+                    <div id="quota-display" style="display:none;text-align:center;font-size:.75rem;padding:6px 8px;margin-bottom:8px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;color:var(--yl)"></div>
+                    <button id="btn-h"
+                        class="btn bh" onclick="submitHarvest()">Cast Nets 🎣</button>
+                </div>
+                <div class="vg" id="vg"></div>
+                <div class="rlc">
+                    <h3 class="ct">Round Log</h3>
+                    <div class="rl" id="rl">
+                        <div class="le">Play a round to see results here.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sts">
+                <div class="sc2">
+                    <div class="sl2">Fish Population</div>
+                    <div class="sv2" id="sp">100</div>
+                    <div class="ss" id="schg"></div>
+                </div>
+                <div class="sc2">
+                    <div class="sl2">Your Earnings</div>
+                    <div class="sv2" id="se">$0</div>
+                    <div class="ss">$3 per fish</div>
+                </div>
+                <div class="sc2">
+                    <div class="sl2">MSY (Max Sust. Yield)</div>
+                    <div class="sv2" id="smsy" style="-webkit-text-fill-color:var(--gn);color:var(--gn)">—</div>
+                    <div class="ss">K×r÷4 — total for all players</div>
+                </div>
+                <div class="sc2">
+                    <div class="sl2">OSY (Optimum Sust. Yield)</div>
+                    <div class="sv2" id="sosy" style="-webkit-text-fill-color:var(--tl);color:var(--tl)">—</div>
+                    <div class="ss">≈ 80% of MSY — safe target</div>
+                </div>
+                <div class="sc2">
+                    <div class="sl2">Regrowth</div>
+                    <div class="sv2" id="srg">—</div>
+                </div>
+                <div class="sc2 cc">
+                    <div class="sl2">Population History</div><canvas id="ccv" height="140"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- EDU sidebar -->
+        <aside id="edu" class="edu">
+            <div class="edu-h">
+                <h3>📚 Learn</h3><button style="background:0;border:0;color:var(--t3);cursor:pointer;font-size:1.2rem"
+                    onclick="document.getElementById('edu').classList.remove('open')">✕</button>
+            </div>
+            <div class="etabs"><button class="etab active" onclick="stab(this,'theory')">Theory</button><button
+                    class="etab" onclick="stab(this,'strats')">Strategies</button><button class="etab"
+                    onclick="stab(this,'rw')">Real World</button></div>
+            <div class="econ">
+                <div class="ep active" id="pane-theory">
+                    <h4>Tragedy of the Commons</h4>
+                    <p>Coined by <strong>Garrett Hardin</strong> (1968): individuals acting in self-interest deplete a
+                        shared resource.</p>
+                    <div class="co"><strong>🔑</strong> Each person gains full benefit of taking more, but depletion
+                        cost is shared by all.</div>
+                    <h4>Maximum Sustainable Yield (MSY)</h4>
+                    <p><strong>MSY = K × r ÷ 4</strong> — the largest harvest sustainable indefinitely, at population
+                        K/2.</p>
+                    <div class="co"><strong>📐</strong> K=<span id="edu-k">100</span>, r=<span id="edu-r">0.3</span> →
+                        MSY = <strong><span id="edu-msy">7.5</span></strong> fish/round for ALL players.</div>
+                    <h4>Optimum Sustainable Yield (OSY)</h4>
+                    <p><strong>≈ 80% of MSY</strong> — conservative buffer for environmental variability.</p>
+                    <h4>Nash Equilibrium</h4>
+                    <p>Rational strategy: maximize harvest. But collective result = collapse.</p>
+                </div>
+                <div class="ep" id="pane-strats">
+                    <h4>AI Strategies</h4>
+                    <div class="co"><strong>🌿 Sustainable</strong> — ≤ fair share of regrowth</div>
+                    <div class="co"><strong>💰 Greedy</strong> — takes as much as possible</div>
+                    <div class="co"><strong>🪞 Copycat</strong> — mirrors average human harvest</div>
+                    <div class="co"><strong>🧠 Adaptive</strong> — scales with population health</div>
+                    <div class="co"><strong>🤝 Cooperative</strong> — minimum sustainable amount</div>
+                </div>
+                <div class="ep" id="pane-rw">
+                    <h4>Real-World Examples</h4>
+                    <p>🐟 <strong>Overfishing</strong> — Grand Banks cod collapsed 1992</p>
+                    <p>🌍 <strong>Climate Change</strong> — Atmosphere as shared commons</p>
+                    <p>💊 <strong>Antibiotic Resistance</strong> — Individual benefit, collective harm</p>
+                    <h4>Solutions</h4>
+                    <p>→ Regulation → Privatization → Community Governance (Ostrom) → Social Norms</p>
+                </div>
+            </div>
+        </aside>
+    </section>
+
+    <!-- END -->
+    <section id="end-scr" class="scr">
+        <div class="ec">
+            <div class="ei" id="eico">🐟</div>
+            <h2 class="et2" id="etit">Simulation Complete</h2>
+            <p class="es" id="esub"></p>
+            <div class="eg">
+                <div class="ek">
+                    <h3>🏆 Leaderboard</h3>
+                    <div id="est"></div>
+                </div>
+                <div class="ek">
+                    <h3>📈 Population Over Time</h3><canvas id="ecv" height="200"></canvas>
+                </div>
+            </div>
+            <div class="ek ekw">
+                <h3>🤔 What If Everyone Cooperated?</h3>
+                <div class="cf" id="ecf"></div>
+            </div>
+            <div class="ek ekw">
+                <h3>💬 Debriefing Questions</h3>
+                <div class="dq" id="edq"></div>
+            </div>
+            <div class="ek ekw">
+                <h3>📖 Key Lessons</h3>
+                <div class="lsn" id="els"></div>
+            </div>
+            <button class="btn" onclick="go('intro')" style="margin-top:2rem">Play Again 🔄</button>
+        </div>
+    </section>
+
+    <script src="game.js"></script>
+</body>
+
+</html>

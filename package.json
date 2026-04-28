@@ -1,0 +1,21 @@
+{
+  "name": "tragedy-of-the-commons",
+  "version": "2.0.0",
+  "description": "Tragedy of the Commons — Multiplayer Classroom Simulation (Shared Sea Edition)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["simulation", "game-theory", "tragedy-of-commons", "classroom", "multiplayer", "websocket"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "localtunnel": "^2.0.2",
+    "ws": "^8.19.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
