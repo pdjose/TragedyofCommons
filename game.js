@@ -748,7 +748,9 @@ function updateUI() {
     var msy = Math.round(CFG.K * CFG.R / 4 * 10) / 10;
     var osy = Math.round(msy * 0.8 * 10) / 10;
     el('smsy').textContent = msy + ' fish'; el('sosy').textContent = osy + ' fish';
-    el('srg').textContent = S.hist.length > 1 ? ((S.hist[S.hist.length - 1] - S.hist[S.hist.length - 2]) >= 0 ? '+' : '') + Math.round(S.hist[S.hist.length - 1] - S.hist[S.hist.length - 2]) : '—';
+    // Show actual regrowth from logistic formula, not net population change
+    var actualRg = CFG.R * S.pop * (1 - S.pop / CFG.K);
+    el('srg').textContent = S.hist.length > 1 ? '+' + Math.round(actualRg) : '—';
     if (el('edu-k')) { el('edu-k').textContent = CFG.K; el('edu-r').textContent = CFG.R; el('edu-msy').textContent = msy; }
     if (myId) { var me = allP.find(function (p) { return p.id === myId; }); if (me) el('se').textContent = '$' + me.earn; }
     else if (myRole === 'admin') { var totE = 0; allP.forEach(function (p) { totE += p.earn; }); el('se').textContent = '$' + totE; }
